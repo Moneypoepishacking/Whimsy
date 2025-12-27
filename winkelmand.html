@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Winkelmand - Whimsy Snoep</title>
+    <style>
+        /* === COMPLETE CSS VOOR WINKELMAND === */
+        :root {
+            --primary: #ff6b8b;
+            --secondary: #6a5af9;
+            --dark: #2a2a3c;
+            --light: #f8f9ff;
+            --success: #4cd964;
+            --danger: #ff3b30;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background: #f8f9ff;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .main-header {
+            background: white;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--dark);
+            text-decoration: none;
+        }
+
+        .logo-accent { color: var(--primary); }
+
+        .main-nav ul {
+            display: flex;
+            list-style: none;
+            gap: 1.5rem;
+        }
+
+        .main-nav a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+
+        .main-nav a:hover, .main-nav a.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            padding: 20px 0;
+            color: #666;
+        }
+
+        .breadcrumb a {
+            color: var(--secondary);
+            text-decoration: none;
+        }
+
+        /* Winkelmand Container */
+        .cart-container {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 40px;
+            padding: 30px 0 80px;
+        }
+
+        @media (max-width: 900px) {
+            .cart-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Producten in mand */
+        .cart-items {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        }
+
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .cart-title {
+            font-size: 1.8rem;
+            color: var(--dark);
+        }
+
+        .clear-cart {
+            background: none;
+            border: none;
+            color: var(--danger);
+            font-weight: 600;
+            cursor: pointer;
+            padding: 8px 15px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .clear-cart:hover {
+            background: rgba(255, 59, 48, 0.1);
+        }
+
+        /* Cart Item */
+        .cart-item {
+            display: grid;
+            grid-template-columns: 100px 1fr auto;
+            gap: 20px;
+            padding: 25px 0;
+            border-bottom: 1px solid #f0f0f0;
+            align-items: center;
+        }
+
+        .cart-item-img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 12px;
+        }
+
+        .item-details h3 {
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+        }
+
+        .item-price {
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 1.3rem;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .quantity-btn {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            border: 2px solid #e0e0ff;
+            background: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .quantity-btn:hover {
+            border-color: var(--secondary);
+            background: var(--secondary);
+            color: white;
+        }
+
+        .quantity-display {
+            font-weight: 700;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .item-remove {
+            background: none;
+            border: none;
+            color: var(--danger);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .item-remove:hover {
+            background: rgba(255, 59, 48, 0.1);
+        }
+
+        /* Lege winkelmand */
+        .empty-cart {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-cart h2 {
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .btn-continue {
+            display: inline-block;
+            padding: 12px 30px;
+            background: var(--secondary);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 600;
+            margin-top: 20px;
+        }
+
+        /* Order Summary */
+        .order-summary {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 100px;
+            height: fit-content;
+        }
+
+        .summary-title {
+            font-size: 1.5rem;
+            margin-bottom: 25px;
+            color: var(--dark);
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .summary-row.total {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            border-bottom: none;
+            margin-top: 10px;
+        }
+
+        .discount-code {
+            margin: 25px 0;
+        }
+
+        .discount-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0ff;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn-apply {
+            width: 100%;
+            padding: 12px;
+            background: var(--dark);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-apply:hover {
+            background: #1a1a2c;
+        }
+
+        .btn-checkout {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+
+        .btn-checkout:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(106, 90, 249, 0.3);
+        }
+
+        /* Footer */
+        .main-footer {
+            background: var(--dark);
+            color: white;
+            text-align: center;
+            padding: 40px 20px;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+    <!-- === HTML VOOR WINKELMAND === -->
+    <header class="main-header">
+        <div class="container header-container">
+            <a href="index.html" class="logo">Whimsy<span class="logo-accent">.</span></a>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="producten.html">Producten</a></li>
+                    <li><a href="winkelmand.html" class="active">Winkelmand</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="registratie.html">Account</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="breadcrumb">
+            <a href="index.html">Home</a> > <a href="producten.html">Producten</a> > <strong>Winkelmand</strong>
+        </div>
+
+        <h1 style="font-size: 2.5rem; margin-bottom: 30px;">🛒 Jouw Winkelmand</h1>
+
+        <div class="cart-container">
+            <div class="cart-items">
+                <div class="cart-header">
+                    <h2 class="cart-title">Jouw geselecteerde producten</h2>
+                    <button class="clear-cart" id="clearCart">Mandje legen</button>
+                </div>
+                
+                <div id="cartItemsContainer">
+                    <!-- Winkelmand items worden hier geladen -->
+                    <div class="empty-cart" id="emptyCartMessage">
+                        <h2>Je winkelmand is leeg</h2>
+                        <p>Voeg producten toe aan je winkelmand om ze hier te zien</p>
+                        <a href="producten.html" class="btn-continue">Verder winkelen</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="order-summary">
+                <h2 class="summary-title">Bestelling Overzicht</h2>
+                
+                <div class="summary-row">
+                    <span>Subtotaal</span>
+                    <span id="subtotal">€0.00</span>
+                </div>
+                <div class="summary-row">
+                    <span>Verzending</span>
+                    <span id="shipping">€3.95</span>
+                </div>
+                <div class="summary-row">
+                    <span>BTW (21%)</span>
+                    <span id="tax">€0.00</span>
+                </div>
+                
+                <div class="discount-code">
+                    <input type="text" class="discount-input" placeholder="Kortingscode">
+                    <button class="btn-apply">Code toepassen</button>
+                </div>
+
+                <div class="summary-row total">
+                    <span>TOTAAL</span>
+                    <span id="totalPrice">€0.00</span>
+                </div>
+
+                <button class="btn-checkout" id="checkoutBtn">AFREKENEN</button>
+                
+                <p style="text-align: center; margin-top: 15px; font-size: 0.9rem; color: #666;">
+                    ✅ Veilig betalen met iDEAL, PayPal of creditcard
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <footer class="main-footer">
+        <div class="container">
+            <p>&copy; 2025 Whimsy - Amerikaanse Snoepwebshop</p>
+        </div>
+    </footer>
+
+    <!-- === JAVASCRIPT VOOR WINKELMAND === -->
+    <script>
+        // Winkelmand data
+        let shoppingCart = JSON.parse(localStorage.getItem('whimsyCart')) || [];
+
+        // Product database (vereenvoudigd voor deze pagina)
+        const productDB = {
+            1: { name: "Reese's Peanut Butter Cups", price: 3.99, image: "https://images.unsplash.com/photo-1584384689201-e0bcbe2c7f1d?w=600" },
+            2: { name: "Takis Fuego", price: 2.49, image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600" },
+            3: { name: "Flamin' Hot Cheetos", price: 2.79, image: "https://images.unsplash.com/photo-1603532648955-ee310e72e9c8?w=600" },
+            4: { name: "Twix Chocolate Bar", price: 1.89, image: "https://images.unsplash.com/photo-1575377427642-087cf684f29d?w=600" },
+            5: { name: "Sour Patch Kids", price: 2.29, image: "https://images.unsplash.com/photo-1603532648947-a4c0f4d91b3a?w=600" },
+            6: { name: "M&M's Peanut", price: 1.99, image: "https://images.unsplash.com/photo-1520342868574-5fa3804e551c?w=600" }
+        };
+
+        // Bereken totaalbedrag
+        function calculateTotals() {
+            const subtotal = shoppingCart.reduce((sum, item) => {
+                const product = productDB[item.id];
+                return sum + (product.price * (item.quantity || 1));
+            }, 0);
+            
+            const shipping = subtotal > 30 ? 0 : 3.95;
+            const tax = subtotal * 0.21;
+            const total = subtotal + shipping + tax;
+            
+            return { subtotal, shipping, tax, total };
+        }
+
+        // Update prijsweergave
+        function updatePriceDisplay() {
+            const { subtotal, shipping, tax, total } = calculateTotals();
+            
+            document.getElementById('subtotal').textContent = `€${subtotal.toFixed(2)}`;
+            document.getElementById('shipping').textContent = shipping === 0 ? 'GRATIS' : `€${shipping.toFixed(2)}`;
+            document.getElementById('tax').textContent = `€${tax.toFixed(2)}`;
+            document.getElementById('totalPrice').textContent = `€${total.toFixed(2)}`;
+        }
+
+        // Toon winkelmand items
+        function displayCartItems() {
+            const container = document.getElementById('cartItemsContainer');
+            const emptyMsg = document.getElementById('emptyCartMessage');
+            
+            if (shoppingCart.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-cart">
+                        <h2>Je winkelmand is leeg</h2>
+                        <p>Voeg producten toe aan je winkelmand om ze hier te zien</p>
+                        <a href="producten.html" class="btn-continue">Verder winkelen</a>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Bouw HTML voor winkelmand items
+            let cartHTML = '';
+            
+            shoppingCart.forEach((item, index) => {
+                const product = productDB[item.id];
+                if (!product) return;
+                
+                cartHTML += `
+                    <div class="cart-item" data-index="${index}">
+                        <img src="${product.image}" alt="${product.name}" class="cart-item-img">
+                        <div class="item-details">
+                            <h3>${product.name}</h3>
+                            <p class="item-price">€${product.price.toFixed(2)}</p>
+                            <div class="quantity-controls">
+                                <button class="quantity-btn" onclick="updateQuantity(${index}, -1)">-</button>
+                                <span class="quantity-display">${item.quantity || 1}</span>
+                                <button class="quantity-btn" onclick="updateQuantity(${index}, 1)">+</button>
+                            </div>
+                        </div>
+                        <button class="item-remove" onclick="removeItem(${index})">🗑️</button>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = cartHTML;
+        }
+
+        // Update hoeveelheid
+        function updateQuantity(index, change) {
+            if (!shoppingCart[index]) return;
+            
+            shoppingCart[index].quantity = (shoppingCart[index].quantity || 1) + change;
+            
+            // Verwijder item als hoeveelheid 0 of minder is
+            if (shoppingCart[index].quantity <= 0) {
+                shoppingCart.splice(index, 1);
+            }
+            
+            saveCart();
+            displayCartItems();
+            updatePriceDisplay();
+        }
+
+        // Verwijder item
+        function removeItem(index) {
+            shoppingCart.splice(index, 1);
+            saveCart();
+            displayCartItems();
+            updatePriceDisplay();
+        }
+
+        // Leeg winkelmand
+        document.getElementById('clearCart').addEventListener('click', function() {
+            if (shoppingCart.length === 0) return;
+            
+            if (confirm('Weet je zeker dat je de winkelmand wilt legen?')) {
+                shoppingCart = [];
+                saveCart();
+                displayCartItems();
+                updatePriceDisplay();
+            }
+        });
+
+        // Afrekenen
+        document.getElementById('checkoutBtn').addEventListener('click', function() {
+            if (shoppingCart.length === 0) {
+                alert('Je winkelmand is leeg!');
+                return;
+            }
+            
+            // Bereken totaal
+            const { total } = calculateTotals();
+            
+            // Toon bevestiging
+            const confirmMessage = `
+                Bestelling Bevestigen:
+                
+                Aantal producten: ${shoppingCart.length}
+                Totaalbedrag: €${total.toFixed(2)}
+                
+                Klik op OK om verder te gaan naar betaling.
+                
+                (Demo: In een echte webshop zou hier een betalingsgateway verschijnen)
+            `;
+            
+            if (confirm(confirmMessage)) {
+                // Simuleer betaling
+                alert('Bedankt voor je bestelling! Je ontvangt binnenkort een bevestigingsmail.\n\nJe bestelling is verwerkt en wordt binnen 2-3 werkdagen verzonden.');
+                
+                // Leeg winkelmand na succesvolle bestelling
+                shoppingCart = [];
+                saveCart();
+                displayCartItems();
+                updatePriceDisplay();
+            }
+        });
+
+        // Opslaan in localStorage
+        function saveCart() {
+            localStorage.setItem('whimsyCart', JSON.stringify(shoppingCart));
+        }
+
+        // Kortingscode (demo)
+        document.querySelector('.btn-apply').addEventListener('click', function() {
+            const code = document.querySelector('.discount-input').value.toUpperCase();
+            const discountCodes = {
+                'WELKOM10': 10,
+                'SNOEP15': 15,
+                'WHIMSY20': 20
+            };
+            
+            if (discountCodes[code]) {
+                alert(`Kortingscode "${code}" toegepast! Je krijgt ${discountCodes[code]}% korting.`);
+            } else {
+                alert('Ongeldige kortingscode. Probeer WELKOM10, SNOEP15 of WHIMSY20');
+            }
+        });
+
+        // Initialiseer pagina
+        document.addEventListener('DOMContentLoaded', function() {
+            displayCartItems();
+            updatePriceDisplay();
+        });
+    </script>
+</body>
+</html>
