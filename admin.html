@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Whimsy Snoep</title>
+    <style>
+        :root {
+            --primary: #ff6b8b;
+            --secondary: #6a5af9;
+            --dark: #2a2a3c;
+            --light: #f8f9ff;
+            --success: #4cd964;
+            --warning: #ff9500;
+            --danger: #ff3b30;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background: #f0f2f5;
+            min-height: 100vh;
+        }
+
+        /* Login Scherm */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--dark), #1a1a2c);
+        }
+
+        .login-box {
+            background: white;
+            border-radius: 20px;
+            padding: 50px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .login-logo {
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+
+        .login-subtitle {
+            color: #666;
+            margin-bottom: 40px;
+        }
+
+        .login-form .form-group {
+            margin-bottom: 25px;
+            text-align: left;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0ff;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus {
+            border-color: var(--secondary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(106, 90, 249, 0.1);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(106, 90, 249, 0.3);
+        }
+
+        .login-error {
+            color: var(--danger);
+            margin-top: 15px;
+            display: none;
+            background: rgba(255, 59, 48, 0.1);
+            padding: 10px;
+            border-radius: 8px;
+            border-left: 4px solid var(--danger);
+        }
+
+        /* Admin Panel */
+        .admin-panel {
+            display: none;
+            min-height: 100vh;
+        }
+
+        .admin-header {
+            background: var(--dark);
+            color: white;
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+
+        .admin-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .admin-logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+        }
+
+        .admin-user {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        .logout-btn {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        /* Admin Layout */
+        .admin-layout {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: calc(100vh - 80px);
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Sidebar */
+        .admin-sidebar {
+            background: white;
+            border-right: 1px solid #e0e0ff;
+            padding: 30px 0;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .menu-item {
+            padding: 15px 30px;
+            border-left: 4px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .menu-item:hover, .menu-item.active {
+            background: #f8f9ff;
+            border-left-color: var(--secondary);
+            color: var(--secondary);
+        }
+
+        .menu-icon {
+            font-size: 1.2rem;
+            width: 24px;
+        }
+
+        /* Main Content */
+        .admin-main {
+            padding: 30px;
+            background: #f8f9ff;
+        }
+
+        .admin-title {
+            font-size: 2rem;
+            color: var(--dark);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+        }
+
+        .stat-orders .stat-icon { background: rgba(106, 90, 249, 0.1); color: var(--secondary); }
+        .stat-revenue .stat-icon { background: rgba(255, 107, 139, 0.1); color: var(--primary); }
+        .stat-products .stat-icon { background: rgba(76, 217, 100, 0.1); color: var(--success); }
+        .stat-users .stat-icon { background: rgba(255, 149, 0, 0.1); color: var(--warning); }
+
+        .stat-info h3 {
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+
+        .stat-info p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        /* Tabellen */
+        .table-container {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+        }
+
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .admin-table th {
+            background: #f8f9ff;
+            padding: 18px 20px;
+            text-align: left;
+            font-weight: 700;
+            color: var(--dark);
+            border-bottom: 2px solid #e0e0ff;
+        }
+
+        .admin-table td {
+            padding: 15px 20px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status-paid { background: rgba(76, 217, 100, 0.15); color: var(--success); }
+        .status-pending { background: rgba(255, 149, 0, 0.15); color: var(--warning); }
+        .status-cancelled { background: rgba(255, 59, 48, 0.15); color: var(--danger); }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            margin-right: 5px;
+            transition: all 0.3s;
+        }
+
+        .btn-view { background: rgba(106, 90, 249, 0.1); color: var(--secondary); }
+        .btn-edit { background: rgba(255, 149, 0, 0.1); color: var(--warning); }
+        .btn-delete { background: rgba(255, 59, 48, 0.1); color: var(--danger); }
+
+        .action-btn:hover {
+            opacity: 0.8;
+        }
+
+        /* Forms */
+        .form-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .admin-layout {
+                grid-template-columns: 1fr;
+            }
+            .admin-sidebar {
+                display: none;
+            }
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            .login-box {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div class="login-container" id="loginScreen">
+        <div class="login-box">
+            <div class="login-logo">Whimsy<span style="color: #ff6b8b;">.</span>Admin</div>
+            <p class="login-subtitle">Beveiligde toegang voor beheerders</p>
+            
+            <form class="login-form" id="adminLoginForm">
+                <div class="form-group">
+                    <label class="form-label" for="adminUsername">Gebruikersnaam</label>
+                    <input type="text" id="adminUsername" class="form-input" required autocomplete="off">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="adminPassword">Wachtwoord</label>
+                    <input type="password" id="adminPassword" class="form-input" required autocomplete="off">
+                </div>
+                
+                <button type="submit" class="login-btn">Toegang Verkrijgen</button>
+                
+                <div class="login-error" id="loginError">
+                    <strong>Toegang geweigerd:</strong> Onjuiste gebruikersnaam of wachtwoord
+                </div>
+            </form>
+            
+            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
+                <p style="color: #666; font-size: 0.9rem;">
+                    <strong>Let op:</strong> Alleen geautoriseerd personeel heeft toegang tot dit systeem.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Panel -->
+    <div class="admin-panel" id="adminPanel">
+        <header class="admin-header">
+            <nav class="admin-nav">
+                <div class="admin-logo">Whimsy Admin Dashboard</div>
+                <div class="admin-user">
+                    <div class="user-avatar" id="userAvatar">A</div>
+                    <div>
+                        <div style="font-weight: 700;" id="currentUser">Administrator</div>
+                        <div style="font-size: 0.85rem; opacity: 0.8;">Beheerder</div>
+                    </div>
+                    <button class="logout-btn" id="logoutBtn">🔒 Uitloggen</button>
+                </div>
+            </nav>
+        </header>
+
+        <div class="admin-layout">
+            <aside class="admin-sidebar">
+                <ul class="sidebar-menu">
+                    <li class="menu-item active" data-section="dashboard">
+                        <span class="menu-icon">📊</span> Dashboard
+                    </li>
+                    <li class="menu-item" data-section="orders">
+                        <span class="menu-icon">📦</span> Bestellingen
+                    </li>
+                    <li class="menu-item" data-section="products">
+                        <span class="menu-icon">🍬</span> Producten
+                    </li>
+                    <li class="menu-item" data-section="users">
+                        <span class="menu-icon">👥</span> Gebruikers
+                    </li>
+                    <li class="menu-item" data-section="messages">
+                        <span class="menu-icon">✉️</span> Berichten
+                    </li>
+                    <li class="menu-item" data-section="analytics">
+                        <span class="menu-icon">📈</span> Analytics
+                    </li>
+                    <li class="menu-item" data-section="settings">
+                        <span class="menu-icon">⚙️</span> Instellingen
+                    </li>
+                </ul>
+            </aside>
+
+            <main class="admin-main">
+                <!-- Dashboard -->
+                <div class="admin-section" id="dashboardSection">
+                    <h1 class="admin-title">📊 Dashboard Overzicht</h1>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card stat-orders">
+                            <div class="stat-icon">📦</div>
+                            <div class="stat-info">
+                                <h3 id="totalOrders">0</h3>
+                                <p>Nieuwe bestellingen</p>
+                            </div>
+                        </div>
+                        <div class="stat-card stat-revenue">
+                            <div class="stat-icon">💰</div>
+                            <div class="stat-info">
+                                <h3 id="totalRevenue">€0</h3>
+                                <p>Omzet vandaag</p>
+                            </div>
+                        </div>
+                        <div class="stat-card stat-products">
+                            <div class="stat-icon">🍬</div>
+                            <div class="stat-info">
+                                <h3 id="totalProducts">0</h3>
+                                <p>Actieve producten</p>
+                            </div>
+                        </div>
+                        <div class="stat-card stat-users">
+                            <div class="stat-icon">👥</div>
+                            <div class="stat-info">
+                                <h3 id="totalUsers">0</h3>
+                                <p>Nieuwe gebruikers</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Bestelnummer</th>
+                                    <th>Klant</th>
+                                    <th>Datum</th>
+                                    <th>Bedrag</th>
+                                    <th>Status</th>
+                                    <th>Acties</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recentOrders">
+                                <tr>
+                                    <td colspan="6" style="text-align: center; padding: 40px;">
+                                        <p>Nog geen bestellingen ontvangen</p>
+                                        <p style="color: #666; font-size: 0.9rem; margin-top: 10px;">Bestellingen verschijnen hier wanneer klanten afrekenen</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Bestellingen -->
+                <div class="admin-section" id="ordersSection" style="display: none;">
+                    <h1 class="admin-title">📦 Bestellingen Beheer</h1>
+                    
+                    <div class="table-container">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Klant</th>
+                                    <th>Producten</th>
+                                    <th>Totaal</th>
+                                    <th>Status</th>
+                                    <th>Acties</th>
+                                </tr>
+                            </thead>
+                            <tbody id="allOrders">
+                                <tr>
+                                    <td colspan="6" style="text-align: center; padding: 40px;">
+                                        <p>Geen bestellingen gevonden</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Producten -->
+                <div class="admin-section" id="productsSection" style="display: none;">
+                    <h1 class="admin-title">
+                        🍬 Producten Beheer
+                        <button class="action-btn btn-edit" onclick="showAddProductForm()">+ Product Toevoegen</button>
+                    </h1>
+                    
+                    <div class="form-section" id="addProductForm" style="display: none;">
+                        <h3 style="margin-bottom: 25px;">Nieuw Product Toevoegen</h3>
+                        <form id="productForm">
+                            <div class="form-row">
+                                <div>
+                                    <label class="form-label">Product Naam *</label>
+                                    <input type="text" class="form-input" id="productName" required>
+                                </div>
+                                <div>
+                                    <label class="form-label">Prijs (€) *</label>
+                                    <input type="number" step="0.01" min="0" class="form-input" id="productPrice" required>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div>
+                                    <label class="form-label">Categorie *</label>
+                                    <select class="form-input" id="productCategory" required>
+                                        <option value="">Selecteer categorie</option>
+                                        <option value="chocolade">Chocolade</option>
+                                        <option value="zuur">Zuur Snoep</option>
+                                        <option value="chips">Chips</option>
+                                        <option value="kauwgom">Kauwgom</option>
+                                        <option value="candybars">Candybars</option>
+                                        <option value="gummies">Gummies</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="form-label">Voorraad *</label>
+                                    <input type="number" class="form-input" id="productStock" required min="0">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="form-label">Beschrijving</label>
+                                <textarea class="form-input" id="productDescription" rows="3" placeholder="Optionele beschrijving van het product..."></textarea>
+                            </div>
+                            <button type="submit" class="login-btn" style="margin-top: 25px;">Product Opslaan</button>
+                        </form>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Naam</th>
+                                    <th>Categorie</th>
+                                    <th>Prijs</th>
+                                    <th>Voorraad</th>
+                                    <th>Acties</th>
+                                </tr>
+                            </thead>
+                            <tbody id="productsList">
+                                <!-- Producten laden hier -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Overige sections -->
+                <div class="admin-section" id="messagesSection" style="display: none;">
+                    <h1 class="admin-title">✉️ Contact Berichten</h1>
+                    <div id="messagesList">
+                        <div class="form-section">
+                            <p>Nog geen berichten ontvangen</p>
+                            <p style="color: #666; margin-top: 10px;">Contactberichten van klanten verschijnen hier</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="admin-section" id="settingsSection" style="display: none;">
+                    <h1 class="admin-title">⚙️ Instellingen</h1>
+                    <div class="form-section">
+                        <h3 style="margin-bottom: 20px;">Winkel Instellingen</h3>
+                        <form>
+                            <div class="form-row">
+                                <div>
+                                    <label class="form-label">Winkelnaam</label>
+                                    <input type="text" class="form-input" value="Whimsy Snoep" readonly>
+                                </div>
+                                <div>
+                                    <label class="form-label">Gratis verzending vanaf</label>
+                                    <input type="number" class="form-input" value="30" min="0">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div>
+                                    <label class="form-label">Standaard verzendkosten</label>
+                                    <input type="number" class="form-input" value="3.95" step="0.01" min="0">
+                                </div>
+                                <div>
+                                    <label class="form-label">BTW percentage</label>
+                                    <input type="number" class="form-input" value="21" min="0" max="100">
+                                </div>
+                            </div>
+                            <button type="submit" class="login-btn" style="margin-top: 20px;">Instellingen Opslaan</button>
+                        </form>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // STRENG BEVEILIGDE EIGENAAR ACCOUNTS
+        const owners = {
+            'maas': {
+                password: 'Maas3914!',
+                name: 'Maas',
+                email: 'maas@whimsy.nl'
+            },
+            'maud': {
+                password: 'Maud2017!',
+                name: 'Maud',
+                email: 'maud@whimsy.nl'
+            }
+        };
+
+        let currentUser = null;
+        let orders = JSON.parse(localStorage.getItem('whimsyOrders')) || [];
+        let products = JSON.parse(localStorage.getItem('whimsyProducts')) || [];
+        let messages = JSON.parse(localStorage.getItem('whimsyMessages')) || [];
+
+        // Login functionaliteit
+        document.getElementById('adminLoginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('adminUsername').value.trim().toLowerCase();
+            const password = document.getElementById('adminPassword').value;
+            
+            // Controleer of gebruiker een eigenaar is
+            if (owners[username] && owners[username].password === password) {
+                // Succesvol ingelogd
+                currentUser = owners[username];
+                
+                // Update UI
+                document.getElementById('userAvatar').textContent = currentUser.name.charAt(0);
+                document.getElementById('currentUser').textContent = currentUser.name;
+                
+                // Toon admin panel
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('adminPanel').style.display = 'block';
+                
+                // Initialiseer data
+                loadDashboardData();
+                loadProducts();
+                loadMessages();
+                
+                // Sla login status op (30 minuten geldig)
+                sessionStorage.setItem('whimsyAdminLoggedIn', 'true');
+                sessionStorage.setItem('whimsyAdminUser', username);
+                sessionStorage.setItem('whimsyAdminLoginTime', Date.now());
+                
+            } else {
+                // Toon foutmelding
+                const errorElement = document.getElementById('loginError');
+                errorElement.style.display = 'block';
+                
+                // Clear form
+                document.getElementById('adminPassword').value = '';
+                
+                // Verberg foutmelding na 5 seconden
+                setTimeout(() => {
+                    errorElement.style.display = 'none';
+                }, 5000);
+            }
+        });
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            if (confirm('Weet je zeker dat je wilt uitloggen?')) {
+                currentUser = null;
+                sessionStorage.removeItem('whimsyAdminLoggedIn');
+                sessionStorage.removeItem('whimsyAdminUser');
+                sessionStorage.removeItem('whimsyAdminLoginTime');
+                
+                // Reset formulier
+                document.getElementById('adminLoginForm').reset();
+                
+                // Toon login scherm
+                document.getElementById('loginScreen').style.display = 'flex';
+                document.getElementById('adminPanel').style.display = 'none';
+            }
+        });
+
+        // Menu navigatie
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+                
+                document.querySelectorAll('.admin-section').forEach(section => {
+                    section.style.display = 'none';
+                });
+                
+                const sectionId = this.dataset.section + 'Section';
+                document.getElementById(sectionId).style.display = 'block';
+            });
+        });
+
+        // Laad dashboard data
+        function loadDashboardData() {
+            // Orders van vandaag
+            const today = new Date().toDateString();
+            const todaysOrders = orders.filter(order => {
+                const orderDate = new Date(order.date).toDateString();
+                return orderDate === today;
+            });
+            
+            // Omzet van vandaag
+            const todayRevenue = todaysOrders.reduce((sum, order) => sum + order.total, 0);
+            
+            // Producten
+            const activeProducts = products.length;
+            
+            // Gebruikers (geschat)
+            const users = JSON.parse(localStorage.getItem('whimsyUsers')) || [];
+            const newUsers = users.filter(user => {
+                const userDate = new Date(user.joined).toDateString();
+                return userDate === today;
+            }).length;
+            
+            // Update display
+            document.getElementById('totalOrders').textContent = todaysOrders.length;
+            document.getElementById('totalRevenue').textContent = `€${todayRevenue.toFixed(2)}`;
+            document.getElementById('totalProducts').textContent = activeProducts;
+            document.getElementById('totalUsers').textContent = newUsers;
+            
+            // Laad recente bestellingen
+            loadRecentOrders();
+        }
+
+        function loadRecentOrders() {
+            const container = document.getElementById('recentOrders');
+            const allOrdersContainer = document.getElementById('allOrders');
+            
+            if (orders.length === 0) {
+                return; // Blijf bij standaard "geen bestellingen" bericht
+            }
+            
+            const recent = orders.slice(-5).reverse();
+            
+            container.innerHTML = recent.map(order => `
+                <tr>
+                    <td>${order.id}</td>
+                    <td>${order.customer.name}</td>
+                    <td>${new Date(order.date).toLocaleDateString('nl-NL')}</td>
+                    <td>€${order.total.toFixed(2)}</td>
+                    <td><span class="status-badge status-${order.status}">${order.status}</span></td>
+                    <td>
+                        <button class="action-btn btn-view" onclick="viewOrder('${order.id}')">Bekijk</button>
+                    </td>
+                </tr>
+            `).join('');
+            
+            allOrdersContainer.innerHTML = orders.reverse().map(order => `
+                <tr>
+                    <td>${order.id}</td>
+                    <td>${order.customer.name}</td>
+                    <td>${order.items.length} producten</td>
+                    <td>€${order.total.toFixed(2)}</td>
+                    <td><span class="status-badge status-${order.status}">${order.status}</span></td>
+                    <td>
+                        <button class="action-btn btn-view" onclick="viewOrder('${order.id}')">Bekijk</button>
+                        <button class="action-btn btn-edit" onclick="updateOrderStatus('${order.id}', 'verwerkt')">Verwerken</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function loadProducts() {
+            const container = document.getElementById('productsList');
+            
+            if (products.length === 0) {
+                // Standaard producten als er geen zijn
+                products = [
+                    { id: 1, name: "Reese's Peanut Butter Cups", category: "chocolade", price: 3.99, stock: 15 },
+                    { id: 2, name: "Takis Fuego", category: "chips", price: 2.49, stock: 8 },
+                    { id: 3, name: "Sour Patch Kids", category: "zuur", price: 2.29, stock: 12 },
+                    { id: 4, name: "Twix Chocolate Bar", category: "chocolade", price: 1.89, stock: 22 },
+                    { id: 5, name: "Flamin' Hot Cheetos", category: "chips", price: 2.79, stock: 5 },
+                    { id: 6, name: "Pop Tarts Frosted Strawberry", category: "candybars", price: 4.49, stock: 7 }
+                ];
+                localStorage.setItem('whimsyProducts', JSON.stringify(products));
+            }
+            
+            container.innerHTML = products.map(product => `
+                <tr>
+                    <td>${product.id}</td>
+                    <td>${product.name}</td>
+                    <td>${product.category}</td>
+                    <td>€${product.price.toFixed(2)}</td>
+                    <td>${product.stock}</td>
+                    <td>
+                        <button class="action-btn btn-edit" onclick="editProduct(${product.id})">Bewerk</button>
+                        <button class="action-btn btn-delete" onclick="deleteProduct(${product.id})">Verwijder</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function loadMessages() {
+            const container = document.getElementById('messagesList');
+            
+            if (messages.length === 0) {
+                return; // Blijf bij standaard bericht
+            }
+            
+            container.innerHTML = messages.map((msg, index) => `
+                <div class="form-section">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px;">
+                        <div>
+                            <h4 style="margin-bottom: 5px;">${msg.name}</h4>
+                            <p style="color: #666; font-size: 0.9rem;">${msg.email}</p>
+                        </div>
+                        <div style="text-align: right;">
+                            <span style="color: #666; font-size: 0.9rem;">${new Date(msg.timestamp).toLocaleDateString('nl-NL')}</span>
+                            <div style="margin-top: 5px;">
+                                <span style="background: #f0f0ff; padding: 3px 10px; border-radius: 12px; font-size: 0.85rem;">
+                                    ${msg.subject}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <p style="margin-bottom: 15px; line-height: 1.6;">${msg.message}</p>
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f0f0f0; padding-top: 15px;">
+                        <span style="color: #666; font-size: 0.9rem;">
+                            ${msg.order ? `Bestelnummer: ${msg.order}` : 'Geen bestelnummer'}
+                        </span>
+                        <button class="action-btn btn-delete" onclick="deleteMessage(${index})">Verwijder</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Product formulier
+        function showAddProductForm() {
+            document.getElementById('addProductForm').style.display = 'block';
+        }
+
+        document.getElementById('productForm')?.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const newProduct = {
+                id: products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1,
+                name: document.getElementById('productName').value,
+                price: parseFloat(document.getElementById('productPrice').value),
+                category: document.getElementById('productCategory').value,
+                stock: parseInt(document.getElementById('productStock').value),
+                description: document.getElementById('productDescription').value
+            };
+            
+            products.push(newProduct);
+            localStorage.setItem('whimsyProducts', JSON.stringify(products));
+            
+            alert('Product succesvol toegevoegd!');
+            this.reset();
+            document.getElementById('addProductForm').style.display = 'none';
+            loadProducts();
+            loadDashboardData();
+        });
+
+        function editProduct(id) {
+            const product = products.find(p => p.id === id);
+            if (!product) return;
+            
+            const newName = prompt('Nieuwe productnaam:', product.name);
+            if (newName) product.name = newName;
+            
+            const newPrice = prompt('Nieuwe prijs (€):', product.price);
+            if (newPrice) product.price = parseFloat(newPrice);
+            
+            const newStock = prompt('Nieuwe voorraad:', product.stock);
+            if (newStock) product.stock = parseInt(newStock);
+            
+            localStorage.setItem('whimsyProducts', JSON.stringify(products));
+            loadProducts();
+        }
+
+        function deleteProduct(id) {
+            if (confirm('Weet je zeker dat je dit product wilt verwijderen?')) {
+                products = products.filter(p => p.id !== id);
+                localStorage.setItem('whimsyProducts', JSON.stringify(products));
+                loadProducts();
+                loadDashboardData();
+            }
+        }
+
+        function deleteMessage(index) {
+            if (confirm('Bericht verwijderen?')) {
+                messages.splice(index, 1);
+                localStorage.setItem('whimsyMessages', JSON.stringify(messages));
+                loadMessages();
+            }
+        }
+
+        function viewOrder(orderId) {
+            const order = orders.find(o => o.id === orderId);
+            if (!order) return;
+            
+            const itemsText = order.items.map(item => 
+                `${item.quantity}x ${item.name} (€${item.price.toFixed(2)} per stuk)`
+            ).join('\n');
+            
+            alert(`Bestelling Details:\n\n` +
+                  `Bestelnummer: ${order.id}\n` +
+                  `Klant: ${order.customer.name}\n` +
+                  `E-mail: ${order.customer.email}\n` +
+                  `Datum: ${new Date(order.date).toLocaleString('nl-NL')}\n` +
+                  `Status: ${order.status}\n\n` +
+                  `Producten:\n${itemsText}\n\n` +
+                  `Subtotaal: €${order.subtotal.toFixed(2)}\n` +
+                  `Verzending: €${order.shipping.toFixed(2)}\n` +
+                  `BTW: €${order.tax.toFixed(2)}\n` +
+                  `TOTAAL: €${order.total.toFixed(2)}\n\n` +
+                  `Adres: ${order.shippingAddress}`);
+        }
+
+        function updateOrderStatus(orderId, newStatus) {
+            const order = orders.find(o => o.id === orderId);
+            if (order) {
+                order.status = newStatus;
+                localStorage.setItem('whimsyOrders', JSON.stringify(orders));
+                loadRecentOrders();
+                alert(`Bestelling ${orderId} is nu ${newStatus}`);
+            }
+        }
+
+        // Auto-logout na 30 minuten inactiviteit
+        setInterval(() => {
+            const loginTime = sessionStorage.getItem('whimsyAdminLoginTime');
+            if (loginTime && (Date.now() - parseInt(loginTime) > 30 * 60 * 1000)) {
+                alert('Je sessie is verlopen vanwege inactiviteit. Log opnieuw in.');
+                document.getElementById('logoutBtn').click();
+            }
+        }, 60000); // Check elke minuut
+
+        // Check login status bij pagina load
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginTime = sessionStorage.getItem('whimsyAdminLoginTime');
+            const savedUser = sessionStorage.getItem('whimsyAdminUser');
+            
+            if (loginTime && savedUser && owners[savedUser]) {
+                // Controleer of sessie niet verlopen is
+                if (Date.now() - parseInt(loginTime) < 30 * 60 * 1000) {
+                    // Auto-login
+                    document.getElementById('adminUsername').value = savedUser;
+                    document.getElementById('adminPassword').value = owners[savedUser].password;
+                    document.getElementById('adminLoginForm').dispatchEvent(new Event('submit'));
+                } else {
+                    sessionStorage.clear();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
